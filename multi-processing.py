@@ -1,7 +1,6 @@
 from multiprocessing import Pool
 from mpmath import mp
 import numpy as np
-import matplotlib.pyplot as plt
 mp.dps = 1000
 
 def Nu(i):
@@ -32,11 +31,33 @@ def Nu(i):
 
     # tfb = (P*(-6*A2 + (6*C3 + 3*C4 + 2*(C5 - 3*C7*mp.sqrt(Da) + 6*C5*Da))*G*(1 - Da*G**2) - (2*G*(-1 + Da*G**2)*(-3*C9 + 4*C7*mp.sqrt(Da) + 2*C7*mp.sqrt(Da)*mp.cosh(1/mp.sqrt(Da))))/(1 + mp.cosh(1/mp.sqrt(Da))) + 6*A2*mp.cosh(G) + 6*A1*mp.sinh(G) - 6*mp.sqrt(Da)*G*(A1 - (2*C3 + C4 + C5 - C9 + 4*C5*Da)*(-1 + Da*G**2) + A1*mp.cosh(G) + A2*mp.sinh(G))*mp.tanh(1/(2*mp.sqrt(Da)))))/(6*G*(-1 + Da*G**2))
     tfb = (C5*Da*P*G**2)/(3 - 3*Da*G**2) + (C4*Da*P*G**2)/(2 - 2*Da*G**2) + (C7*mp.sqrt(Da)*P)/(1 - Da*G**2) + (C3*Da*P*G**2)/(1 - Da*G**2) + (C3*P)/(-1 + Da*G**2) + (2*C5*Da*P)/(-1 + Da*G**2) +  (C7*Da**mp.mpf('1.5')*P*G**2)/(-1 + Da*G**2) - (2*C5*Da**2*P*G**2)/(-1 + Da*G**2) + (C4*P)/(-2 + 2*Da*G**2) + (C5*P)/(-3 + 3*Da*G**2) + (A2*P)/(G - Da*G**3) -  (C9*P)/((-1 + Da*G**2)*(1 + mp.cosh(1/mp.sqrt(Da)))) + (4*C7*mp.sqrt(Da)*P)/(3*(-1 + Da*G**2)*(1 + mp.cosh(1/mp.sqrt(Da)))) + (C9*Da*P*G**2)/((-1 + Da*G**2)*(1 + mp.cosh(1/mp.sqrt(Da)))) -  (4*C7*Da**mp.mpf('1.5')*P*G**2)/(3*(-1 + Da*G**2)*(1 + mp.cosh(1/mp.sqrt(Da)))) + (2*C7*mp.sqrt(Da)*P*mp.cosh(1/mp.sqrt(Da)))/(3*(-1 + Da*G**2)*(1 + mp.cosh(1/mp.sqrt(Da)))) -  (2*C7*Da**mp.mpf('1.5')*P*G**2*mp.cosh(1/mp.sqrt(Da)))/(3*(-1 + Da*G**2)*(1 + mp.cosh(1/mp.sqrt(Da)))) + (A2*P*mp.cosh(G))/(-G + Da*G**3) + (A1*P*mp.sinh(G))/(-G + Da*G**3) +  (A1*mp.sqrt(Da)*P*mp.tanh(1/(2*mp.sqrt(Da))))/(1 - Da*G**2) + (C4*mp.sqrt(Da)*P*mp.tanh(1/(2*mp.sqrt(Da))))/(1 - Da*G**2) + (C5*mp.sqrt(Da)*P*mp.tanh(1/(2*mp.sqrt(Da))))/(1 - Da*G**2) +  (C9*Da**mp.mpf('1.5')*P*G**2*mp.tanh(1/(2*mp.sqrt(Da))))/(1 - Da*G**2) - (2*C3*mp.sqrt(Da)*P*mp.tanh(1/(2*mp.sqrt(Da))))/(-1 + Da*G**2) + (C9*mp.sqrt(Da)*P*mp.tanh(1/(2*mp.sqrt(Da))))/(-1 + Da*G**2) -  (4*C5*Da**mp.mpf('1.5')*P*mp.tanh(1/(2*mp.sqrt(Da))))/(-1 + Da*G**2) + (2*C3*Da**mp.mpf('1.5')*P*G**2*mp.tanh(1/(2*mp.sqrt(Da))))/(-1 + Da*G**2) + (C4*Da**mp.mpf('1.5')*P*G**2*mp.tanh(1/(2*mp.sqrt(Da))))/(-1 + Da*G**2) +  (C5*Da**mp.mpf('1.5')*P*G**2*mp.tanh(1/(2*mp.sqrt(Da))))/(-1 + Da*G**2) + (4*C5*Da**mp.mpf('2.5')*P*G**2*mp.tanh(1/(2*mp.sqrt(Da))))/(-1 + Da*G**2) + (A1*mp.sqrt(Da)*P*mp.cosh(G)*mp.tanh(1/(2*mp.sqrt(Da))))/(1 - Da*G**2) +  (A2*mp.sqrt(Da)*P*mp.sinh(G)*mp.tanh(1/(2*mp.sqrt(Da))))/(1 - Da*G**2)
-    return (lDa, lCv, float(-(2/(Cv * tfb))))
+    return ['%.20f' % lDa, '%.20f' % lCv, '%.20f' % float(-(2/(Cv * tfb)))]
 
 
 # print(Nu((4, -3, 0.01)))
 
 if __name__ == '__main__':
     with Pool(8) as p:
-        print(p.map(Nu, [(lDa, lCv, 0.1) for lDa in np.arange(-4, 4, 0.1) for lCv in np.arange(-3, 0, 0.1)]))
+        lDaMin = mp.mpf('-5')
+        lDaMax= mp.mpf('4')
+        lDaStep = mp.mpf('0.05')
+        lDaSize = (lDaMax - lDaMin)/lDaStep + 1
+
+        lCvMin = mp.mpf('-3')
+        lCvMax= mp.mpf('0')
+        lCvStep = mp.mpf('0.05')
+        lCvSize = (lCvMax - lCvMin)/lCvStep + 1
+        
+        lDaArray = [None]*int(lDaSize)
+        lCvArray = [None]*int(lCvSize)
+
+        for i in range(int(lDaSize)):
+            lDaArray[i] = lDaMin + i * lDaStep
+        
+        for i in range(int(lCvSize)):
+            lCvArray[i] = lCvMin + i * lCvStep
+        
+        ans = p.map(Nu, [(lDa, lCv, 1) for lDa in lDaArray for lCv in lCvArray])
+        with open("output.txt", "a") as f:
+            print('\n'.join(['\t'.join([str(j) for j in i])  for i in ans]), file=f)
+    
