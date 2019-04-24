@@ -33,15 +33,15 @@ def Nu(Da, Cv, Br):
 def NuArray(Da, Cv, Br):
     x = np.arange(*Cv)
     y = np.arange(*Da)
-    Z = [[Nu(Br=mp.mpf(Br), Cv=10**mp.mpf(lCv), Da=10**mp.mpf(lDa)) for lDa in x] for lCv in y]
-    X,Y = np.meshgrid(x, y)
-    return X, Y, Z
+    return [(float(lDa), float(lCv), float(Nu(Br=mp.mpf(Br), Cv=10**mp.mpf(lCv), Da=10**mp.mpf(lDa)))) for lDa in x for lCv in y]
 
 
 # Nu(mp.mpf('0.001'), mp.mpf('8943'), mp.mpf('0.1'))
 
-C = plt.contourf(*NuArray(Da=(mp.mpf(-5), mp.mpf(4), mp.mpf(0.1)), Cv=(mp.mpf(-3), mp.mpf(0), mp.mpf(0.1)), Br=mp.mpf('0.1')), 8, alpha=.75)
-plt.clabel(C, inline=True, fontsize=10)
-plt.xticks(())
-plt.yticks(())
-plt.show()
+# C = plt.contourf(*NuArray(Da=(mp.mpf(-5), mp.mpf(4), mp.mpf(0.1)), Cv=(mp.mpf(-3), mp.mpf(0), mp.mpf(0.1)), Br=mp.mpf('0.1')), 8, alpha=.75)
+# plt.clabel(C, inline=True, fontsize=10)
+# plt.xticks(())
+# plt.yticks(())
+# plt.show()
+
+print(NuArray(Da=(mp.mpf(-5), mp.mpf(4)), Cv=(mp.mpf(-3), mp.mpf(0)), Br=mp.mpf('0.1')))
