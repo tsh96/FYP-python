@@ -1,6 +1,11 @@
 {
     "cSpell.words": [
+        "coth",
+        "csch",
         "mpmath",
+        "numpy",
+        "pyplot",
+        "sech",
         "tanh"
     ]
 }
